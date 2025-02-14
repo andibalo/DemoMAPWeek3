@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "id.ac.umn.demomapweek3"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "id.ac.umn.demomapweek3"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
