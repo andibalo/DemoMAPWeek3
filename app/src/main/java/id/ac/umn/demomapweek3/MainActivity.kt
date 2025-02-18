@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.*
+import androidx.navigation.navDeepLink
 import id.ac.umn.demomapweek3.ui.theme.DemoMAPWeek3Theme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -36,6 +38,8 @@ sealed class Screen(val route: String, val title: String, val icon: androidx.com
     object Home : Screen("home", "Home", Icons.Filled.Home)
     object Details : Screen("details", "Details", Icons.Filled.Info)
     object Profile : Screen("profile", "Profile", Icons.Filled.Person)
+    object New : Screen("new", "New", Icons.Filled.Info)
+    object Deeplink : Screen("deeplink", "Deeplink", Icons.Filled.Info)
 }
 
 // Define Screens for Drawer Navigation
@@ -58,7 +62,7 @@ fun MainScreen() {
     ) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
-            topBar = { TopAppBarWithDrawer(drawerState, coroutineScope) },
+            topBar = { TopAppBarWithDrawer(drawerState, coroutineScope, navController) },
             bottomBar = { BottomNavigationBar(navController) }
         ) { innerPadding ->
             NavHost(
@@ -66,11 +70,15 @@ fun MainScreen() {
                 startDestination = Screen.Home.route,
                 modifier = Modifier.padding(innerPadding)
             ) {
-                composable(Screen.Home.route) { HomeScreen() }
-                composable(Screen.Details.route) { DetailsScreen() }
-                composable(Screen.Profile.route) { ProfileScreen() }
-                composable(DrawerScreen.Settings.route) { SettingsScreen() }
-                composable(DrawerScreen.Help.route) { HelpScreen() }
+                composable(Screen.Home.route) { HomeScreen(navController) }
+                composable(Screen.Details.route) { DetailsScreen(navController) }
+                composable(Screen.Profile.route) { ProfileScreen(navController) }
+                composable(DrawerScreen.Settings.route) { SettingsScreen(navController) }
+                composable(DrawerScreen.Help.route) { HelpScreen(navController) }
+                composable(Screen.New.route) { NewScreen(navController) }
+                composable(Screen.Deeplink.route, deepLinks = listOf(navDeepLink { uriPattern = "demoapp://deeplink" })) {
+                    DeeplinkScreen(navController)
+                }
             }
         }
     }
@@ -113,10 +121,10 @@ fun DrawerContent(navController: NavController, drawerState: DrawerState) {
 }
 
 
-//Drawer
+//Top App Bar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBarWithDrawer(drawerState: DrawerState, coroutineScope: CoroutineScope) {
+fun TopAppBarWithDrawer(drawerState: DrawerState, coroutineScope: CoroutineScope, navController: NavController) {
     TopAppBar(
         title = { Text("Demo App") },
         navigationIcon = {
@@ -126,6 +134,7 @@ fun TopAppBarWithDrawer(drawerState: DrawerState, coroutineScope: CoroutineScope
         }
     )
 }
+
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
@@ -149,35 +158,63 @@ fun BottomNavigationBar(navController: NavController) {
 
 //Screens
 @Composable
-fun HomeScreen() {
-    Column {
-        Text(text = "Home Screen", modifier = Modifier.padding(start = 16.dp))
+fun HomeScreen(navController: NavController) {
+    Column(modifier = Modifier.padding(start = 16.dp)) {
+        Text(text = "Home Screen")
+        Button(onClick = { navController.navigate(Screen.New.route) }) {
+            Text("Go to New Screen")
+        }
+        Button(onClick = { navController.navigate("demoapp://deeplink") }) {
+            Text("Go to Deeplink Screen")
+        }
     }
 }
 
 @Composable
-fun DetailsScreen() {
+fun DetailsScreen(navController: NavController) {
     Column {
         Text(text = "Details Screen", modifier = Modifier.padding(start = 16.dp))
     }
 }
 
 @Composable
-fun ProfileScreen() {
-    Column {
-        Text(text = "Profile Screen", modifier = Modifier.padding(start = 16.dp))
+fun ProfileScreen(navController: NavController) {
+    Column(modifier = Modifier.padding(start = 16.dp)) {
+        Text(text = "Profile Screen")
+    }
+}
+
+
+@Composable
+fun NewScreen(navController: NavController) {
+    Column(modifier = Modifier.padding(start = 16.dp)) {
+        Text(text = "New Screen")
+        Button(onClick = { navController.navigate(Screen.Home.route) }) {
+            Text("Back to Home")
+        }
     }
 }
 
 @Composable
-fun SettingsScreen() {
+fun DeeplinkScreen(navController: NavController) {
+    Column(modifier = Modifier.padding(start = 16.dp)) {
+        Text(text = "Deeplink Screen")
+        Button(onClick = { navController.navigate(Screen.Home.route) }) {
+            Text("Back to Home")
+        }
+    }
+}
+
+
+@Composable
+fun SettingsScreen(navController: NavController) {
     Column {
         Text(text = "Settings Screen", modifier = Modifier.padding(start = 16.dp))
     }
 }
 
 @Composable
-fun HelpScreen() {
+fun HelpScreen(navController: NavController) {
     Column {
         Text(text = "Help Screen", modifier = Modifier.padding(start = 16.dp))
     }
